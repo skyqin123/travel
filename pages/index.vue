@@ -1,72 +1,70 @@
 <template>
-  <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        SSRTravel
-      </h1>
-      <h2 class="subtitle">
-        My fantabulous Nuxt.js project
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+  <div class="travel_index">
+    <div class="index_swiper">
+      <el-carousel height="1000px">
+        <el-carousel-item v-for="(item, index) in swiperList" :key="index">
+          <!-- <h3>{{ item }}</h3> -->
+          <div
+            class="bgc_img"
+            :style="`background:url(${$axios.defaults.baseURL + item.url}) no-repeat center center;height:1000px`"
+          ></div>
+        </el-carousel-item>
+      </el-carousel>
+
+       <div class="index_search">
+      <indexTab></indexTab>
     </div>
+    </div>
+
+   
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-
+import indexTab from "@/components/indexTab.vue";
 export default {
+  data() {
+    return {
+      swiperList: []
+    };
+  },
   components: {
-    Logo
+    indexTab
+  },
+  asyncData(context) {
+    // console.log(context)
+    return context.$axios.get("/scenics/banners").then(res => {
+      // console.log(res)
+      return { swiperList: res.data.data };
+    });
   }
-}
+  // mounted () {
+  //   this.$axios.get("/scenics/banners")
+  //   .then (res => {
+  //     console.log(res)
+  //   })
+  // }
+};
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+<style lang="less" scoped>
+.travel_index {
+  width: 100%;
+  .index_swiper {
+    position: relative;
+    width: 100%;
+    .bgc_img {
+      width: 100%;
+      height: 1000px;
+      background-size: 100% 100%;
+    }
+  }
+  .index_search {
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+  }
 }
 </style>
