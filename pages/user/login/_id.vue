@@ -2,11 +2,16 @@
   <div class="login">
     <div class="loginForm">
       <div class="login_title">
-        <div>登录</div>
-        <div>注册</div>
+        <div 
+         @click="$router.push('/user/login/' + index)"
+         :class="{login_title_item:true,active:currentIndex==index}"
+         v-for="(itme, index) in ['登录','注册']" :key="index"
+        >{{itme}}</div>
       </div>
+
       <div class="login_content">
-        <RegisterForm></RegisterForm>
+        <div v-if="currentIndex == 1 "><RegisterForm></RegisterForm></div>
+        <div v-else> <LoginForm></LoginForm></div> 
       </div>
     </div>
   </div>
@@ -14,9 +19,16 @@
 
 <script>
 import RegisterForm from "@/components/user/RegisterForm.vue";
+import LoginForm from "@/components/user/loginForm.vue";
 export default {
+  data () {
+    return {
+      currentIndex: this.$route.params.id
+    }
+  },
   components: {
-    RegisterForm
+    RegisterForm,
+    LoginForm
   }
 };
 </script>
@@ -44,7 +56,7 @@ export default {
     display: flex;
     justify-content: space-between;
 
-    div {
+    .login_title_item {
       flex: 1;
       text-align: center;
       font-size: 30px;
@@ -63,6 +75,7 @@ export default {
         left: 0px;
         width: 100%;
         height: 3px;
+        background-color: orange;
       }
     }
   }
