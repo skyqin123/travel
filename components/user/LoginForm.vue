@@ -54,7 +54,7 @@ export default {
       this.$refs.userForm.validate(valid => {
         if (valid) {
           let aaa = this.$store.dispatch('user/setUser',this.userForm)
-          console.log(aaa);  // 返回一个promise 对象
+          //console.log(aaa);  // 返回一个promise 对象
           
           aaa.then( res => {
             // console.log(123456)

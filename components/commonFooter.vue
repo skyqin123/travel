@@ -45,7 +45,7 @@
       </el-row>
 
       <div class="licence">
-        京ICP备08001421号 京公网安备110108007702 Copyright © 2016-2019 博学谷 All Rights Reserved
+        
       </div>
     </div>
   </div>

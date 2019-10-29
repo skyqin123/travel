@@ -1,170 +1,186 @@
 <template>
-  <header class="header">
-    <el-row
-      type="flex"
-      justify="space-between"
-      class="main"
-    >
-
-      <!-- logo -->
-      <div class="logo">
-        <nuxt-link to="/">
-          <img
+  <div class="header">
+    <div class="main">
+      <div class="main_pages">
+        <nuxt-link
+          to="/"
+          class="pages_logo"
+        > <img
             src="http://157.122.54.189:9093/images/logo.jpg"
             alt=""
-          >
-        </nuxt-link>
+          > </nuxt-link>
+        <nuxt-link
+          class="pages_item"
+          to="/"
+        >首页</nuxt-link>
+        <nuxt-link
+          class="pages_item"
+          to="/post"
+        >旅游攻略</nuxt-link>
+        <nuxt-link
+          class="pages_item"
+          to="/hotel"
+        >酒店</nuxt-link>
+        <nuxt-link
+          class="pages_item"
+          to="/air"
+        >国内机票</nuxt-link>
       </div>
-
-      <!-- 菜单栏 -->
-      <el-row
-        type="flex"
-        class="navs"
-      >
-        <nuxt-link to="/">首页</nuxt-link>
-        <nuxt-link to="/post">旅游攻略</nuxt-link>
-        <nuxt-link to="/hotel">酒店</nuxt-link>
-        <nuxt-link to="/air">国内机票</nuxt-link>
-      </el-row>
-
-      <!-- 登录/用户信息 -->
-      <el-row
-        type="flex"
-        align="middle"
-      >
-
-        <!-- 如果用户存在则展示用户信息，用户数据来自store -->
-        <el-dropdown v-if="false">
-          <el-row
-            type="flex"
-            align="middle"
-            class="el-dropdown-link"
-          >
-            <nuxt-link to="#">
-              <img src="http://157.122.54.189:9093/images/pic_sea.jpeg" />
-              用户名
-            </nuxt-link>
-            <i class="el-icon-caret-bottom el-icon--right"></i>
-          </el-row>
+      <div class="main_login">
+        <el-dropdown>
+          <span class="el-dropdown-link">
+            <i class="el-icon-bell"></i> 消息 <i class="el-icon-caret-bottom"></i>
+          </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>
-              <nuxt-link to="#">个人中心</nuxt-link>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <div @click="handleLogout">退出</div>
-            </el-dropdown-item>
+            <el-dropdown-item>消息</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-
-        <!-- 不存在用户信息展示登录注册链接 -->
         <nuxt-link
-          to="/user/login"
-          class="account-link"
-          v-else
+          class="login_link"
+          to="/user/login/0"
         >
-          登录 / 注册
+
+          <div
+            v-if="userinfo.token"
+            class="login_user"
+          >
+            <el-dropdown>
+              <div class="el-dropdown-link">
+                <img
+                  :src="$axios.defaults.baseURL+userinfo.user.defaultAvatar"
+                  alt=""
+                >
+                <span>{{userinfo.user.nickname}}</span>
+                <i class="el-icon-caret-bottom"></i>
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>个人中心</el-dropdown-item>
+                <el-dropdown-item  ><div @click="handleLogout">退出</div></el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+          <div
+            v-else
+            class="login_text"
+          >登录 / 注册</div>
         </nuxt-link>
-      </el-row>
-    </el-row>
-  </header>
+      </div>
+    </div>
+  </div>
 </template>
+
 <script>
 export default {
-  methods: {
-    // 用户退出
-    handleLogout() {}
+  computed: {
+    userinfo() {
+      return this.$store.state.user.user;  // 因为使用了store中的moudel 所以在获取数据的时候就要加上moudel的名称
+    }
+  },
+  mounted(){
+
+    let userStr=localStorage.getItem("user");
+    if(userStr){
+      // 存在 
+      let userinfo=JSON.parse(userStr);
+      // 把值设置到vuex
+      this.$store.commit("user/setUser",userinfo);
+      console.log(userinfo)
+    }
+  },
+  methods:{
+    // 退出
+    handleLogout(){
+      // 1 删除 vuex中的用户信息
+      // 2 删除本地存储的数据
+      this.$store.commit("user/setUser",{ token: "", user: {}});
+      localStorage.removeItem("user");
+      this.$message.success("退出成功");
+      setTimeout(() => {
+        this.$router.push("/user/login/0");
+
+      }, 1000);
+    }
   }
 };
 </script>
-<style scoped lang="less">
-.header {
-  height: 60px;
-  line-height: 60px;
-  background: #fff;
-  border-bottom: 1px #ddd solid;
-  box-shadow: 0 3px 0 #f5f5f5;
-  box-sizing: border-box;
 
+<style lang="less"  scoped>
+.header {
+  border-bottom: 1px solid #ccc;
+  a {
+    text-decoration: none;
+    // 继承父元素的字体颜色   div标签的 字体 就是这个值
+    color: inherit;
+  }
   .main {
     width: 1000px;
     margin: 0 auto;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
   }
+  .main_pages {
+    display: flex;
 
-  .logo {
-    width: 156px;
-    padding-top: 8px;
-
-    img {
-      display: block;
-      width: 100%;
-    }
-  }
-
-  .navs {
-    margin: 0 20px;
-    flex: 1;
-
-    a {
-      display: block;
+    .pages_item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 0 20px;
-      height: 60px;
-      box-sizing: border-box;
 
-      &:hover,
-      &:focus,
-      &:active {
-        border-bottom: 5px #409eff solid;
-        color: #409eff;
+      &:hover {
+        color: #0094ff;
+        background-color: #fff;
+        // border-bottom: 5px solid  #0094ff;
+        // currentColor = 当前字体的颜色
+        // border-bottom: 5px solid  currentColor;
+        position: relative;
+        &::before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 5px;
+          background-color: #0094ff;
+        }
       }
     }
-
-    /deep/ .nuxt-link-exact-active {
-      background: #409eff;
+    .nuxt-link-exact-active {
       color: #fff !important;
+      background-color: #0094ff !important;
     }
-  }
-
-  .message {
-    height: 36px;
-    line-height: 1;
-    cursor: pointer;
-    .el-icon-bell {
-      margin-right: 2px;
-      font-size: 18px;
-    }
-  }
-
-  .el-dropdown-link {
-    margin-left: 20px;
-
-    &:hover {
+    .pages_logo {
+      background-color: #fff !important;
+      display: flex;
+      align-items: center;
       img {
-        border-color: #409eff;
+        width: 156px;
       }
     }
-
-    a {
-      display: block;
-    }
-
-    img {
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      border: 2px #fff solid;
-      border-radius: 50px;
+  }
+  .main_login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .login_link {
+      font-size: 13px;
+      color: #666;
+      margin-left: 15px;
+      &:hover {
+        color: #0094ff;
+      }
     }
   }
+}
 
-  .account-link {
-    font-size: 14px;
-    margin-left: 10px;
-    color: #666;
-
-    &:hover {
-      color: #409eff;
-      text-decoration: underline;
+.login_user {
+  .el-dropdown-link {
+    img {
+      width: 36px;
     }
+    display: flex;
+    align-items: center;
   }
 }
 </style>
