@@ -1,10 +1,10 @@
 <template>
-  <div class="travel_index">
-    <div class="index_swiper">
-      <el-carousel height="1000px">
-        <el-carousel-item v-for="(item, index) in swiperList" :key="index">
+  <div class="travel_index" style="border:6px solid red">
+    <div class="index_swiper" >
+      <el-carousel height="1000px" >
+        <el-carousel-item  v-for="(item, index) in swiperList" :key="index">
           <!-- <h3>{{ item }}</h3> -->
-          <div
+          <div 
             class="bgc_img"
             :style="`background:url(${$axios.defaults.baseURL + item.url}) no-repeat center center;height:1000px`"
           ></div>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import indexTab from "@/components/indexTab.vue";
+import indexTab from "@/components/index/indexTab.vue";
 export default {
   data() {
     return {
@@ -49,9 +49,10 @@ export default {
 
 <style lang="less" scoped>
 .travel_index {
+  
+    position: relative;
   width: 100%;
   .index_swiper {
-    position: relative;
     width: 100%;
     .bgc_img {
       width: 100%;
