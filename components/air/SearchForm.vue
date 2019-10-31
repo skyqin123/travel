@@ -9,9 +9,9 @@
     </div>
 
     <div class="search_content">
-      <el-form label-width="80px">
+      <el-form label-width="80px" :model="form" :rules="rules" ref="form">
         <!-- 出发城市开始 -->
-        <el-form-item label="出发城市">
+        <el-form-item label="出发城市" prop="departCity">
           <el-autocomplete
             v-model="form.departCity"
             :fetch-suggestions="querySearchAsync"
@@ -21,8 +21,12 @@
         </el-form-item>
         <!-- 出发城市结束 -->
 
+        <!-- 换 -->
+        <div class="exchange" @click="handleExchange">换</div>
+        <!-- 换 -->
+
         <!-- 到达城市开始 -->
-        <el-form-item label="到达城市">
+        <el-form-item label="到达城市" prop="destCity">
           <el-autocomplete
             v-model="form.destCity"
             :fetch-suggestions="querySearchAsync"
@@ -33,10 +37,26 @@
         <!-- 到达城市结束 -->
 
         <!-- 出发时间开始 -->
-        <el-form-item label="出发日期" style="width:100%">
-          <el-date-picker type="date" placeholder="选择日期" v-model="form.departDate"></el-date-picker>
+
+        <el-form-item label="出发日期" prop="departDate">
+          <el-date-picker
+            style="width:100%"
+            type="date"
+            placeholder="选择出发日期"
+            v-model="form.departDate"
+            value-format="yyyy-MM-dd"
+          ></el-date-picker>
         </el-form-item>
         <!-- 出发时间结束 -->
+
+        <!-- 提交按钮开始 -->
+        <el-form-item>
+          <el-button style="width:100%" type="primary" @click="submitSesrch">
+            <i class="el-icon-search"></i>
+            搜索
+          </el-button>
+        </el-form-item>
+        <!-- 提交按钮结束 -->
       </el-form>
     </div>
   </div>
@@ -49,15 +69,26 @@ export default {
       currentIndex: 0,
       form: {
         //  出发城市
-        departCity: "广州市",
+        departCity: "广州",
         // 出发城市 编码
         departCode: "CAN",
         // 到达城市
-        destCity: "上海市",
+        destCity: "上海",
         // 到达城市 编码
         destCode: "SHA",
         // 出发时间
-        departDate: "2019-11-28"
+        departDate: "2019-10-31"
+      },
+      rules: {
+        departCity: [
+          { required: true, message: "请输入出发城市", trigger: "blur" }
+        ],
+        destCity: [
+          { required: true, message: "请输入到达城市", trigger: "blur" }
+        ],
+        departDate: [
+          { required: true, message: "请输入出发时间", trigger: "blur" }
+        ]
       }
     };
   },
@@ -66,14 +97,59 @@ export default {
     // queryString: 所输入的内容
     // 回调函数
     querySearchAsync(queryString, callback) {
-      console.log(queryString);
-      console.log(callback);
+      // console.log(queryString);
+      // console.log(callback);
+      console.log(123123)
+      this.$axios
+        .get("/airs/city", { params: { name: queryString } })
+        .then(res => {
+          console.log(res);
+          let airArr = res.data.data
+          airArr.forEach(e => {
+            // **市里的 ‘市’字去掉，因为后面的提交是没有市字的
+            // str.replace(str1,str2),把字符串str里的str1的字段用str2字段来代替
+            e.name = e.name.replace("市", "");
+            e.value = e.name; // 返回的数据中没有我们自己要的所以要增添一个 value 属性
+          });
+          callback(airArr);
+        });
     },
     handleSelect(item) {
-      console.log(item);
+      // console.log(item);
+      // this.formdepartCity = item.name;
+      this.form.departCode = item.sort;
     },
     handleSelect2(item) {
-      console.log(item);
+      // console.log(item);
+      // this.destCity = item.name;
+      this.form.destCode = item.sort;
+    },
+    submitSesrch() {
+      console.log(this.form);
+      this.$refs.form.validate(valid => {
+        // console.log(123);
+        if (valid) {
+          this.$router.push({ path: "/air/flights", query: this.form });
+        } else {
+          // console.log(222)
+          this.$message("请输入完整的搜索内容");
+          return false;
+        }
+      });
+    },
+    handleExchange () {
+      console.log(123)
+      let form = JSON.parse(JSON.stringify(this.form))
+      // let form=JSON.parse(JSON.stringify(this.form));
+      this.form.departCity=form.destCity;
+      this.form.departCode=form.destCode;
+      // ================
+      this.form.destCity=form.departCity;
+      this.form.destCode=form.departCode;
+      // console.log(this.form)
+      // console.log(form)
+      // [this.form.departCity,this.form.departCode,this.form.destCity,this.form.destCode]=
+      // [this.form.destCity,this.form.destCode,this.form.departCity,this.form.departCode];
     }
   }
 };
@@ -104,6 +180,43 @@ export default {
       width: 100%;
       height: 3px;
       background-color: orange;
+    }
+  }
+}
+.search_content {
+  padding: 0px 67px 0px 10px;
+  position: relative;
+
+  .exchange {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    background: #ccc;
+    position: absolute;
+    top: 40px;
+    right: 32px;
+    cursor: pointer;
+    &::before {
+    content: "";
+    width: 21px;
+    height: 20px;
+    border-top: 2px solid #ccc;
+    border-right: 2px solid #ccc;
+    position: absolute;
+    top: -22px;
+    left: -11px;
+    }
+    &::after {
+    content: "";
+    width: 21px;
+    height: 20px;
+    border-bottom: 2px solid #ccc;
+    border-right: 2px solid #ccc;
+    position: absolute;
+    top: 23px;
+    left: -11px;
     }
   }
 }

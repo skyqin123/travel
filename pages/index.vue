@@ -6,7 +6,7 @@
           <!-- <h3>{{ item }}</h3> -->
           <div 
             class="bgc_img"
-            :style="`background:url(${$axios.defaults.baseURL + item.url}) no-repeat center center;height:1000px`"
+            :style="`background:url(${$axios.defaults.baseURL + item.url}) no-repeat center center; background-size:100% 100%; height:1000px`"
           ></div>
         </el-carousel-item>
       </el-carousel>
